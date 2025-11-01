@@ -12,13 +12,14 @@
 * `dundieAwards` should be non-nullable (either via `@Column` `nullable` attribute or using `int` primitive type for field)
 * There's config for OpenAPI, but because Gradle is missing `springdoc-openapi-starter-webmvc-ui` there is no real OpenAPI support
 * No logging, or even a logger
-* No test coverage at all
+* No test coverage at all (except for the one test that simply wires up and runs the app)
 * No error mapping (`@ControllerAdvice` + `@ExceptionHandler`), so exception stack traces are shown to the user
 * General lack of `@Nonnull` usage. This is especially important when using mixed Java + Kotlin code as Kotlin 'understands' JSR‑305 annotations
+* No way to tell 2 people with same first/last names apart - consider adding some unique identifier or combination of identifiers, like DoB, email, or phone.
 
 ### Minor
 * Type mismatch between getter/setter for `dundieAwards`. Should all be `int` (and non-null in DB).
-* We may want to either make the name of the organization unique, or add a 'key' field that is unique, to be able to tell 2 orgs apart (from the business perspective). 
+* We may want to either make the name of the organization unique, or add a 'key' field that is unique, to be able to tell 2 orgs apart (from the business perspective).
 * `dundieAwards` is never initialized in `DataLoader` (or anywhere), so DB will have NULL values, probably not what we want
 * `dundieAwards` is never actually used in the API, even though the app was supposed to be about these awards
 * Do not call JPA `save()` on an already managed entity in `EmployeeController.updateEmployee()` - it'll unnecessarily call `merge()`. Let JPA do its write-behind.
@@ -30,7 +31,8 @@
 
 ### Nitpick
 * Java 17 => Java 25
-* `!optionalEmployee.isPresent()` => `optionalEmployee.isEmpty()`
+* Replace double negation: `!optionalEmployee.isPresent()` => `optionalEmployee.isEmpty()`
+* `ActivityRepository` is not used in `EmployeeController` - we can remove it for now
 * `@ManyToOne` on `Employee.organization` should have an explicitly configured join column name for consistency
 * I'd prefer using functional style usage of `Optional`, e.g.
 ```
@@ -40,7 +42,6 @@
 
 ## Improvements
 * Add logging (e.g. SLF4J + Logback)
-* Add OpenAPI support
 * Add service layer to implement business logic, or even better, switch to hexagonal architecture (overkill for a toy project like this, though)
 * Consume and produce DTOs instead of JPA entities in the API. Add adapters, ideally using some sort of adapter library, like MapStruct.
 * Add caching (e.g. Redis + Spring `@Cacheable`, etc. annotations)
@@ -48,6 +49,8 @@
 * Add metrics (Micrometer)
 * Add API for managing orgs, events, awards
 * Consider using GraphQL instead of REST, giving the client more flexibility (more relevant for modern, single page or mobile apps)
+* Separate Spring profiles/config for runtime, test, etc.
+* Add Docker Compose file to start up the whole stack for local testing, especially after switching to PostgreSQL and adding Redis
 
 ## Miscellaneous
 ### Docker
