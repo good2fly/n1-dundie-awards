@@ -17,7 +17,7 @@
 * General lack of `@Nonnull` usage. This is especially important when using mixed Java + Kotlin code as Kotlin 'understands' JSR‑305 annotations
 
 ### Minor
-* Type mismatch between getter/setter for `dundieAwards`.  
+* Type mismatch between getter/setter for `dundieAwards`. Should all be `int` (and non-null in DB).
 * We may want to either make the name of the organization unique, or add a 'key' field that is unique, to be able to tell 2 orgs apart (from the business perspective). 
 * `dundieAwards` is never initialized in `DataLoader` (or anywhere), so DB will have NULL values, probably not what we want
 * `dundieAwards` is never actually used in the API, even though the app was supposed to be about these awards
@@ -31,6 +31,7 @@
 ### Nitpick
 * Java 17 => Java 25
 * `!optionalEmployee.isPresent()` => `optionalEmployee.isEmpty()`
+* `@ManyToOne` on `Employee.organization` should have an explicitly configured join column name for consistency
 * I'd prefer using functional style usage of `Optional`, e.g.
 ```
   return optionalEmployee.map(ResponseEntity::ok)
@@ -38,15 +39,15 @@
 ```
 
 ## Improvements
-* Add logging (SLF4J)
+* Add logging (e.g. SLF4J + Logback)
 * Add OpenAPI support
 * Add service layer to implement business logic, or even better, switch to hexagonal architecture (overkill for a toy project like this, though)
 * Consume and produce DTOs instead of JPA entities in the API. Add adapters, ideally using some sort of adapter library, like MapStruct.
-* Consider using GraphQL instead of REST, giving the client more flexibility (more relevant for modern, single page or mobile apps).
+* Add caching (e.g. Redis + Spring `@Cacheable`, etc. annotations)
 * Enable Spring Boot Actuator for health, 
 * Add metrics (Micrometer)
-* `@ManyToOne` on `Employee.organization` should have an explicit join column name for consistency
-* Add API for managing orgs, events.
+* Add API for managing orgs, events, awards
+* Consider using GraphQL instead of REST, giving the client more flexibility (more relevant for modern, single page or mobile apps)
 
 ## Miscellaneous
 ### Docker
