@@ -33,6 +33,7 @@
 * `EmployeeController.createEmployee` does not follow the pattern of the other endpoints returning `ResponseEntity`. Also, it is customary to return 201 - Created status here.
 * Returning a response body from `DELETE` is really not necessary. It's customary to just return 204 - No Content
 * No `toString` implementation in the entities, so can't meaningfully log them
+* Replace `@Controller` with `@RestController`, remove `@ResponseBody`
 
 ### Nitpick
 * Java 17 => Java 25
