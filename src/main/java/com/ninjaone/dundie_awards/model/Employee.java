@@ -17,7 +17,7 @@ public class Employee {
     private String lastName;
 
     @Column(name = "dundie_awards")
-    private Integer dundieAwards;
+    private int dundieAwards;
 
     @ManyToOne
     private Organization organization;
@@ -69,7 +69,18 @@ public class Employee {
         this.dundieAwards = dundieAwards;
     }
 
-    public Integer getDundieAwards(){
+    public int getDundieAwards(){
         return dundieAwards;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dundieAwards=" + dundieAwards +
+                ", organization=" + organization +
+                '}';
     }
 }
