@@ -23,12 +23,16 @@
 * We may want to either make the name of the organization unique, or add a 'key' field that is unique, to be able to tell 2 orgs apart (from the business perspective).
 * `dundieAwards` is never initialized in `DataLoader` (or anywhere), so DB will have NULL values, probably not what we want
 * `dundieAwards` is never actually used in the API, even though the app was supposed to be about these awards
-* Do not call JPA `save()` on an already managed entity in `EmployeeController.updateEmployee()` - it'll unnecessarily call `merge()`. Let JPA do its write-behind.
+* Do not call JPA `save()` on an already managed entity in `EmployeeController.updateEmployee()` - this is bad practice, and it'll unnecessarily call `merge()`. Let JPA do its write-behind.
 * Do not use field injection, use ctor injection and make injected fields final
 * Package name `dundie_awards` is non-conventional (underscore). Should be `dundieawards`
 * DB table names should be singular, not plural
 * `occuredAt` and `occured_at` are misspelled in `Activity.java`
 * No API versioning (Spring 7 supports this out of the box)
+* `EmployeeController.getAllEmployees` does not follow the pattern of the other endpoints returning `ResponseEntity`.
+* `EmployeeController.createEmployee` does not follow the pattern of the other endpoints returning `ResponseEntity`. Also, it is customary to return 201 - Created status here.
+* Returning a response body from `DELETE` is really not necessary. It's customary to just return 204 - No Content
+* No `toString` implementation in the entities, so can't meaningfully log them
 
 ### Nitpick
 * Java 17 => Java 25
