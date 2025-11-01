@@ -3,6 +3,7 @@
 ### Major
 * No transactions for the REST endpoints!! Add `@Transactional` to the endpoints, or manage transactions manually via Spring transaction manager. 
 * The data source properties in `application.yaml` are ineffective, as the level `spring` is repeated. Remove one level of `spring`
+* Also, the whole `spring.jpa.database-platform` section is bogus. No need to specify driver class or dialect (unless custom), it's all derived from the URL. 
 * Controller directly calling repositories -> no service layer (if it meant to be a real app with layered architecture)
 * Entities directly exposed in API, tightly coupling the API to the internal data model. This is a major antipattern!
 * Application allows creating 'floating' employees, that is, employees with no organization, due to nullability of FK to `Organization`,
