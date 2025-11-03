@@ -5,10 +5,11 @@
 * ✅ The data source properties in `application.yaml` are ineffective, as the level `spring` is repeated. Remove one level of `spring`
 * ✅ Also, the whole `spring.jpa.database-platform` section is bogus. No need to specify driver class or dialect (unless custom), it's all derived from the URL. 
 * ✅️ Controller directly calling repositories -> no service layer (if it meant to be a real app with layered architecture)
-* ⚠️ Entities directly exposed in the API, tightly coupling the API to the internal data model. This is a major antipattern!
+* ✅ Entities directly exposed in the API, tightly coupling the API to the internal data model. This is a major antipattern!
   Not only that, but it leads to weird situations where we require an organization sub-object to be present when cratiny an employee when we only need an org ID.
-* ⚠️ Application allows creating 'floating' employees, that is, employees with no organization, due to nullability of FK to `Organization`,
-* ⚠️ No validation of the input (e.g. for non-null, valid length, content, etc.)
+* ✅ Using entities as request objects. Same problems as using them in the responses, plus puts weird requirements on the client (e.g. embed an organization in a create employee request). 
+* ⚠️ Application allows creating 'floating' employees, that is, employees with no organization, due to nullability of FK to `Organization`, and lack of enforcement in input.
+* ✅ No validation of the input (e.g. for non-null, valid length, content, etc.)
 * ⚠️ No scrubbing of the input (i.e. remove or escape HTML tags) so it can lead to cross-site scripting attacks.
 * ✅ `dundieAwards` should be non-nullable (either via `@Column` `nullable` attribute or using `int` primitive type for field)
 * ✅ There's config for OpenAPI, but because Gradle is missing `springdoc-openapi-starter-webmvc-ui` there is no real OpenAPI support
@@ -18,8 +19,6 @@
 * ⚠️ General lack of `@Nonnull` usage. This is especially important when using mixed Java + Kotlin code as Kotlin 'understands' JSR‑305 annotations
 * ⚠️ No way to tell 2 people with same first/last names apart - consider adding some unique identifier or combination of identifiers, like DoB, email, or phone.
 * ⚠️ In a real app, initial (and subsequent updates) schema s not typically generated directly by JPA. Instead, use some migration tool (e.g. Flyway) to manage schema evolution.
-* ⚠️ I would personally not use JPA, unless most of the team is very familiar with the various (mostly performance) pitfalls around JPA/Hibernate. 
-  It's also not very conducive for Domain Driven Design, as it encourages YOLO implementation and anemic object model. Prefer Spring Data JDBC.
 
 ### Medium/Minor
 * ✅ Type mismatch between getter/setter for `dundieAwards`. Should all be `int` (and non-null in DB).
@@ -44,13 +43,15 @@
 * ⚠️ `Activity` uses `LocalDateTime` for occurred-at. This may or may not be what we want, but if we want absolute time, we should use `OffsetDateTime` or `Instant`.
 * ⚠️ Repository scanning should be restricted to only the `repository` directory, otherwise app startup time will suffer 
 * ⚠️ Initial data should not normally be provided within the application code. Use some init SQL script(s), possibly via Flyway
+* ⚠️ I would personally not use JPA, unless most of the team is very familiar with the various (mostly performance) pitfalls around JPA/Hibernate.
+  It's also not very conducive for Domain Driven Design, as it encourages YOLO implementation and anemic object model. Prefer Spring Data JDBC.
 
 ### Nitpick
 * ✅  Replace double negation: `!optionalEmployee.isPresent()` => `optionalEmployee.isEmpty()`
 * ✅ `ActivityRepository` is not used in `EmployeeController` - we can remove it for now
 * ⚠️ `@ManyToOne` on `Employee.organization` should have an explicitly configured join column name for consistency
 * ⚠️ Returning a response body from `DELETE` is really not necessary. It's customary to just return 204 - No Content
-* ⚠️ I'd prefer using functional style usage of `Optional`, e.g.
+* ✅ I'd prefer using functional style usage of `Optional`, e.g.
 ```
   return optionalEmployee.map(ResponseEntity::ok)
                          .orElse(ResponseEntity.notFound().build());
