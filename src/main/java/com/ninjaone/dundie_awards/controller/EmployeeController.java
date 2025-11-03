@@ -1,13 +1,15 @@
 package com.ninjaone.dundie_awards.controller;
 
+import com.ninjaone.dundie_awards.dto.EmployeeDto;
 import com.ninjaone.dundie_awards.model.Employee;
-import com.ninjaone.dundie_awards.repository.EmployeeRepository;
+import com.ninjaone.dundie_awards.request.EmployeeRequest;
+import com.ninjaone.dundie_awards.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,80 +25,72 @@ import java.util.Optional;
 @RestController
 public class EmployeeController {
 
-    final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final EmployeeRepository employeeRepository;
+    final EmployeeService employeeService;
 
-    public EmployeeController(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
     // get all employees
     @Transactional(readOnly = true)
     @GetMapping("/employees")
-    public ResponseEntity<List<Employee>> getAllEmployees() {
+    public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
         logger.debug("getAllEmployees: invoked");
-        logger.info("getAllEmployees: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
-        return ResponseEntity.ok(employeeRepository.findAll());
+        // TODO would be better to sort by last name (or something) to make response deterministic
+        List<Employee> employees = employeeService.findAllEmployees();
+        return ResponseEntity.ok(employees.stream().map(this::toDto).toList());
     }
 
     // create employee rest api
     @Transactional
     @PostMapping("/employees")
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody @Valid EmployeeRequest employee) {
         logger.debug("createEmployee: invoked with request: {}", employee);
-        logger.debug("createEmployee: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
-        Employee saved = employeeRepository.save(employee);
-        return ResponseEntity.ok(saved);
+        Employee created = employeeService.create(employee);
+        return ResponseEntity.ok(toDto(created));
     }
 
     // get employee by id rest api
     @Transactional(readOnly = true)
     @GetMapping("/employees/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable long id) {
         logger.debug("getEmployeeById: invoked with id: {}", id);
-        logger.debug("getEmployeeById: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
-        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (optionalEmployee.isPresent()) {
-            return ResponseEntity.ok(optionalEmployee.get());
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Optional<Employee> optionalEmployee = employeeService.findById(id);
+        return optionalEmployee.map(employee -> ResponseEntity.ok(toDto(employee)))
+                               .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // update employee rest api
     @Transactional
     @PutMapping("/employees/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employeeDetails) {
+    public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable long id, @RequestBody @Valid EmployeeRequest employeeDetails) {
         logger.debug("updateEmployee: invoked with id: {}, details: {}", id, employeeDetails);
-        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (optionalEmployee.isEmpty()) {
-            logger.error("updateEmployee: updateEmployee with ID={} not found", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Employee employee = optionalEmployee.get();
-        employee.setFirstName(employeeDetails.getFirstName());
-        employee.setLastName(employeeDetails.getLastName());
-
-        return ResponseEntity.ok(employee);
+        Optional<Employee> optionalEmployee = employeeService.update(id, employeeDetails);
+        return optionalEmployee.map(employee -> ResponseEntity.ok(toDto(employee)))
+                               .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // delete employee rest api
     @Transactional
     @DeleteMapping("/employees/{id}")
-    public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable long id) {
         logger.debug("deleteEmployee: invoked with id: {}", id);
-        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (optionalEmployee.isEmpty()) {
-            logger.error("updateEmployee: deleteEmployee with ID={} not found", id);
+
+        boolean deleted = employeeService.deleteById(id);
+
+        if (deleted) {
+            Map<String, Boolean> response = Map.of("deleted", true);
+            return ResponseEntity.ok(response);
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
 
-        Employee employee = optionalEmployee.get();
-        employeeRepository.delete(employee);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return ResponseEntity.ok(response);
+    // TODO Use a mapping framework, like MapStruct, in a real project.
+    private EmployeeDto toDto(Employee employee) {
+        return new EmployeeDto(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getDundieAwards(),
+                               employee.getOrganization().getId(), employee.getOrganization().getName());
     }
 }

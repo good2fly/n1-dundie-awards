@@ -1,7 +1,11 @@
 package com.ninjaone.dundie_awards.model;
 
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "organizations")
@@ -15,8 +19,16 @@ public class Organization {
   @Column(name = "name")
   private String name;
 
-  public Organization() {
+  @CreatedDate
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
+  @LastModifiedDate
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
+
+
+  public Organization() {
   }
 
   public Organization(String name) {
@@ -38,6 +50,22 @@ public class Organization {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Instant createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Instant getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Instant updatedAt) {
+    this.updatedAt = updatedAt;
   }
 
   @Override
