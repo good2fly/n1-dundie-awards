@@ -1,54 +1,62 @@
 package com.ninjaone.dundie_awards.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import com.ninjaone.dundie_awards.model.Employee;
-import com.ninjaone.dundie_awards.repository.ActivityRepository;
 import com.ninjaone.dundie_awards.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping()
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private ActivityRepository activityRepository;
+    private final EmployeeRepository employeeRepository;
+
+    public EmployeeController(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
 
     // get all employees
+    @Transactional(readOnly = true)
     @GetMapping("/employees")
-    @ResponseBody
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        logger.debug("getAllEmployees: invoked");
+        logger.info("getAllEmployees: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
+        return ResponseEntity.ok(employeeRepository.findAll());
     }
 
     // create employee rest api
+    @Transactional
     @PostMapping("/employees")
-    @ResponseBody
-    public Employee createEmployee(@RequestBody Employee employee) {
-        return employeeRepository.save(employee);
+    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+        logger.debug("createEmployee: invoked with request: {}", employee);
+        logger.debug("createEmployee: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
+        Employee saved = employeeRepository.save(employee);
+        return ResponseEntity.ok(saved);
     }
 
     // get employee by id rest api
+    @Transactional(readOnly = true)
     @GetMapping("/employees/{id}")
-    @ResponseBody
     public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+        logger.debug("getEmployeeById: invoked with id: {}", id);
+        logger.debug("getEmployeeById: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
         if (optionalEmployee.isPresent()) {
             return ResponseEntity.ok(optionalEmployee.get());
@@ -58,11 +66,13 @@ public class EmployeeController {
     }
 
     // update employee rest api
+    @Transactional
     @PutMapping("/employees/{id}")
-    @ResponseBody
     public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employeeDetails) {
+        logger.debug("updateEmployee: invoked with id: {}, details: {}", id, employeeDetails);
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (!optionalEmployee.isPresent()) {
+        if (optionalEmployee.isEmpty()) {
+            logger.error("updateEmployee: updateEmployee with ID={} not found", id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -70,16 +80,17 @@ public class EmployeeController {
         employee.setFirstName(employeeDetails.getFirstName());
         employee.setLastName(employeeDetails.getLastName());
 
-        Employee updatedEmployee = employeeRepository.save(employee);
-        return ResponseEntity.ok(updatedEmployee);
+        return ResponseEntity.ok(employee);
     }
 
     // delete employee rest api
+    @Transactional
     @DeleteMapping("/employees/{id}")
-    @ResponseBody
     public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable Long id) {
+        logger.debug("deleteEmployee: invoked with id: {}", id);
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (!optionalEmployee.isPresent()) {
+        if (optionalEmployee.isEmpty()) {
+            logger.error("updateEmployee: deleteEmployee with ID={} not found", id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 

@@ -1,3 +1,8 @@
+logging:
+  level:
+    org.springframework: INFO
+    com.ninjaone.dundie_awards: DEBUG
+
 springdoc:
   api-docs:
     path: /openapi
@@ -5,15 +10,13 @@ server:
   port: 3000
 
 spring:
-  spring:
-    datasource:
-      url: jdbc:h2:mem:mydb
-      username: sa
-      password: password
-      driverClassName: org.h2.Driver
-    jpa:
-      spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
-#  datasource:
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: password
+  jpa:
+    show-sql: true
+  #  datasource:
 #    url: jdbc:postgresql://localhost:5432/postgres
 #    username: postgres
 #    password: postgres

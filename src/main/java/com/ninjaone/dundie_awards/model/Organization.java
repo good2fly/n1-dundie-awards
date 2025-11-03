@@ -1,14 +1,16 @@
 package com.ninjaone.dundie_awards.model;
 
 import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "organizations")
+@EntityListeners(AuditingEntityListener.class)
 public class Organization {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private Long id;
 
   @Column(name = "name")
   private String name;
@@ -22,11 +24,11 @@ public class Organization {
     this.name = name;
   }
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -36,5 +38,13 @@ public class Organization {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public String toString() {
+    return "Organization{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            '}';
   }
 }
