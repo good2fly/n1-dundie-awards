@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public record ActivityRequest(
+        @NotNull
         @Size(min = 1, max = 1024)
         String event,
 

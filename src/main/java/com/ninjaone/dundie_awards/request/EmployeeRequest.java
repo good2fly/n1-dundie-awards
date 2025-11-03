@@ -4,13 +4,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record EmployeeRequest(
-        @Size(min = 0, max = 512)
+        @NotNull
+        @Size(min = 1, max = 512)
         String firstName,
 
+        @NotNull
         @Size(min = 1, max = 512)
         String lastName,
 
-        @NotNull
         long organizationId
 ) {
 }
