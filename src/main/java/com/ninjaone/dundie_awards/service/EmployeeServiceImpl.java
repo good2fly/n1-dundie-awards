@@ -1,7 +1,10 @@
 package com.ninjaone.dundie_awards.service;
 
 import com.ninjaone.dundie_awards.model.Employee;
+import com.ninjaone.dundie_awards.model.Organization;
 import com.ninjaone.dundie_awards.repository.EmployeeRepository;
+import com.ninjaone.dundie_awards.repository.OrganizationRepository;
+import com.ninjaone.dundie_awards.request.EmployeeRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,9 +17,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final EmployeeRepository employeeRepository;
+    private final OrganizationRepository organizationRepository;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, OrganizationRepository organizationRepository) {
         this.employeeRepository = employeeRepository;
+        this.organizationRepository = organizationRepository;
     }
 
     @Override
@@ -30,19 +35,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee create(Employee employee) {
-        if (employee.getId() != null) {
-            throw new IllegalArgumentException("Cannot create an employee that already has an ID=" + employee.getId());
-        }
+    public Employee create(EmployeeRequest employeeRequest) {
+
+        Organization organization = organizationRepository.findById(employeeRequest.organizationId())
+                .orElseThrow(() -> new IllegalArgumentException("Organization by ID=" + employeeRequest.organizationId() + " not found"));
+        Employee employee = new Employee(employeeRequest.firstName(), employeeRequest.lastName(), organization);
         return employeeRepository.save(employee);
     }
 
     @Override
-    public Optional<Employee> update(long id, Employee employee) {
-        return employeeRepository.findById(employee.getId())
+    public Optional<Employee> update(long id, EmployeeRequest employeeRequest) {
+        return employeeRepository.findById(id)
                 .map(emp -> {
-                    emp.setFirstName(employee.getFirstName());
-                    emp.setLastName(employee.getLastName());
+                    emp.setFirstName(employeeRequest.firstName());
+                    emp.setLastName(employeeRequest.lastName());
                     return emp;
                 });
     }

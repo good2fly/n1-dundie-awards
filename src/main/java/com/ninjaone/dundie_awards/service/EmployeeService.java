@@ -1,6 +1,7 @@
 package com.ninjaone.dundie_awards.service;
 
 import com.ninjaone.dundie_awards.model.Employee;
+import com.ninjaone.dundie_awards.request.EmployeeRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,9 +12,9 @@ public interface EmployeeService {
 
     List<Employee> findAllEmployees();
 
-    Employee create(Employee employee);
+    Employee create(EmployeeRequest employee);
 
-    Optional<Employee> update(long id, Employee employee);
+    Optional<Employee> update(long id, EmployeeRequest employee);
 
     boolean deleteById(long id);
 }

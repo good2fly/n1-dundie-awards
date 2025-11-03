@@ -2,13 +2,14 @@ package com.ninjaone.dundie_awards.controller;
 
 import com.ninjaone.dundie_awards.dto.EmployeeDto;
 import com.ninjaone.dundie_awards.model.Employee;
+import com.ninjaone.dundie_awards.request.EmployeeRequest;
 import com.ninjaone.dundie_awards.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,7 +45,7 @@ public class EmployeeController {
     // create employee rest api
     @Transactional
     @PostMapping("/employees")
-    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody @Valid EmployeeRequest employee) {
         logger.debug("createEmployee: invoked with request: {}", employee);
         Employee created = employeeService.create(employee);
         return ResponseEntity.ok(toDto(created));
@@ -64,7 +64,7 @@ public class EmployeeController {
     // update employee rest api
     @Transactional
     @PutMapping("/employees/{id}")
-    public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable long id, @RequestBody Employee employeeDetails) {
+    public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable long id, @RequestBody @Valid EmployeeRequest employeeDetails) {
         logger.debug("updateEmployee: invoked with id: {}, details: {}", id, employeeDetails);
         Optional<Employee> optionalEmployee = employeeService.update(id, employeeDetails);
         return optionalEmployee.map(employee -> ResponseEntity.ok(toDto(employee)))
