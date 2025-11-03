@@ -71,7 +71,7 @@ public class EmployeeController {
     public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employeeDetails) {
         logger.debug("updateEmployee: invoked with id: {}, details: {}", id, employeeDetails);
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (!optionalEmployee.isPresent()) {
+        if (optionalEmployee.isEmpty()) {
             logger.error("updateEmployee: updateEmployee with ID={} not found", id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -80,8 +80,7 @@ public class EmployeeController {
         employee.setFirstName(employeeDetails.getFirstName());
         employee.setLastName(employeeDetails.getLastName());
 
-        Employee updatedEmployee = employeeRepository.save(employee);
-        return ResponseEntity.ok(updatedEmployee);
+        return ResponseEntity.ok(employee);
     }
 
     // delete employee rest api
@@ -90,7 +89,7 @@ public class EmployeeController {
     public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable Long id) {
         logger.debug("deleteEmployee: invoked with id: {}", id);
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (!optionalEmployee.isPresent()) {
+        if (optionalEmployee.isEmpty()) {
             logger.error("updateEmployee: deleteEmployee with ID={} not found", id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
