@@ -1,5 +1,6 @@
 package com.ninjaone.dundie_awards.controller;
 
+import com.ninjaone.dundie_awards.dto.EmployeeDto;
 import com.ninjaone.dundie_awards.model.Employee;
 import com.ninjaone.dundie_awards.service.EmployeeService;
 import org.slf4j.Logger;
@@ -35,44 +36,39 @@ public class EmployeeController {
     // get all employees
     @Transactional(readOnly = true)
     @GetMapping("/employees")
-    public ResponseEntity<List<Employee>> getAllEmployees() {
+    public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
         logger.debug("getAllEmployees: invoked");
-        return ResponseEntity.ok(employeeService.findAllEmployees());
+        List<Employee> employees = employeeService.findAllEmployees();
+        return ResponseEntity.ok(employees.stream().map(this::toDto).toList());
     }
 
     // create employee rest api
     @Transactional
     @PostMapping("/employees")
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody Employee employee) {
         logger.debug("createEmployee: invoked with request: {}", employee);
         Employee created = employeeService.create(employee);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.ok(toDto(created));
     }
 
     // get employee by id rest api
     @Transactional(readOnly = true)
     @GetMapping("/employees/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable long id) {
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable long id) {
         logger.debug("getEmployeeById: invoked with id: {}", id);
         Optional<Employee> optionalEmployee = employeeService.findById(id);
-        if (optionalEmployee.isPresent()) {
-            return ResponseEntity.ok(optionalEmployee.get());
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return optionalEmployee.map(employee -> ResponseEntity.ok(toDto(employee)))
+                               .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // update employee rest api
     @Transactional
     @PutMapping("/employees/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable long id, @RequestBody Employee employeeDetails) {
+    public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable long id, @RequestBody Employee employeeDetails) {
         logger.debug("updateEmployee: invoked with id: {}, details: {}", id, employeeDetails);
         Optional<Employee> optionalEmployee = employeeService.update(id, employeeDetails);
-        if (optionalEmployee.isEmpty()) {
-            logger.error("updateEmployee: updateEmployee with ID={} not found", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(optionalEmployee.get());
+        return optionalEmployee.map(employee -> ResponseEntity.ok(toDto(employee)))
+                               .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // delete employee rest api
@@ -89,5 +85,10 @@ public class EmployeeController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    // TODO Use a mapping framework, like MapStruct, in a real project.
+    private EmployeeDto toDto(Employee employee) {
+        return new EmployeeDto(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getDundieAwards());
     }
 }
