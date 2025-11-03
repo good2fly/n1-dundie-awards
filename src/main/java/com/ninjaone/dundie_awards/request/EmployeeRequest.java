@@ -12,6 +12,7 @@ public record EmployeeRequest(
         @Size(min = 1, max = 512)
         String lastName,
 
+        // TODO find out if we need to be able to change the organization for an existing employee
         long organizationId
 ) {
 }

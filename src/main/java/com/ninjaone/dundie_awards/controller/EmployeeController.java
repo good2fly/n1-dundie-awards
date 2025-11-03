@@ -38,6 +38,7 @@ public class EmployeeController {
     @GetMapping("/employees")
     public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
         logger.debug("getAllEmployees: invoked");
+        // TODO would be better to sort by last name (or something) to make response deterministic
         List<Employee> employees = employeeService.findAllEmployees();
         return ResponseEntity.ok(employees.stream().map(this::toDto).toList());
     }
@@ -89,6 +90,7 @@ public class EmployeeController {
 
     // TODO Use a mapping framework, like MapStruct, in a real project.
     private EmployeeDto toDto(Employee employee) {
-        return new EmployeeDto(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getDundieAwards());
+        return new EmployeeDto(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getDundieAwards(),
+                               employee.getOrganization().getId(), employee.getOrganization().getName());
     }
 }
