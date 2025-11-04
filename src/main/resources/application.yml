@@ -40,3 +40,10 @@ spring:
       static-locations: file:src/main/resources/static/
       cache:
         period: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # In a real app, secure non-trivial endpoints
+        include: '*'

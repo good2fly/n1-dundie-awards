@@ -14,9 +14,8 @@
 * ✅ `dundieAwards` should be non-nullable (either via `@Column` `nullable` attribute or using `int` primitive type for field)
 * ✅ There's config for OpenAPI, but because Gradle is missing `springdoc-openapi-starter-webmvc-ui` there is no real OpenAPI support
 * ✅ No logging, or even a logger
-* ⚠️ No test coverage at all (except for the one test that simply wires up and runs the app)
-* ⚠️ No error mapping (`@ControllerAdvice` + `@ExceptionHandler`), so exception stack traces are shown to the user
-* ⚠️ General lack of `@Nonnull` usage. This is especially important when using mixed Java + Kotlin code as Kotlin 'understands' JSR‑305 annotations
+* ✅ No test coverage at all (except for the one test that simply wires up and runs the app)
+* ✅ No error mapping (`@ControllerAdvice` + `@ExceptionHandler`), so exception stack traces are shown to the user
 * ⚠️ No way to tell 2 people with same first/last names apart - consider adding some unique identifier or combination of identifiers, like DoB, email, or phone.
 * ⚠️ In a real app, initial (and subsequent updates) schema s not typically generated directly by JPA. Instead, use some migration tool (e.g. Flyway) to manage schema evolution.
 
@@ -26,6 +25,7 @@
   This may be fine if we want to handle awards via a separate endpoint, but then it should not be in the input either.
 * ⚠️ `EmployeeController.updateEmployee` really only updates the first/last names and ignores organization and dundie awards. If that's the case it should be called `changeEmployeeName` and perhaps a different REST endpoint.
 * ✅ The `id` field is primitive `long` in the entities, instead of `Long`. While this is not a fatal mistake, it's unconventional and confusing (Hibernate treats id=0 as "unsaved" entity, but 0 is also a valid DB ID value).
+* ⚠️ General lack of `@Nonnull` usage. This is especially important when using mixed Java + Kotlin code as Kotlin 'understands' JSR‑305 annotations
 * ⚠️ We may want to either make the name of the organization unique, or add a 'key' field that is unique, to be able to tell 2 orgs apart (from the business perspective).
 * ✅ `dundieAwards` is never initialized in `DataLoader` (or anywhere), so DB will have NULL values, probably not what we want
 * ⚠️ `dundieAwards` is never actually used in the API, even though the app was supposed to be about these awards
@@ -60,8 +60,8 @@
 ## Improvements
 * Java 17 => Java 25
 * ✅ Add logging (e.g. SLF4J + Logback)
-* Add service layer to implement business logic, or even better, switch to hexagonal architecture (overkill for a toy project like this, though)
-* Consume and produce DTOs instead of JPA entities in the API. Add adapters, ideally using some sort of adapter library, like MapStruct.
+* ✅ Add service layer to implement business logic, or even better, switch to hexagonal architecture (overkill for a toy project like this, though)
+* ✅ Consume and produce DTOs instead of JPA entities in the API. Add adapters, ideally using some sort of adapter library, like MapStruct.
 * ✅ Add audit fields (e.g. createdAt, createdBy, updatedAt, updatedBy) to the entities.
 * Add entity versioning (e.g. using `@Version`) to entities in order to support optimistic locking.
 * Add caching (e.g. Redis + Spring `@Cacheable`, etc. annotations)
@@ -70,7 +70,7 @@
   leading to very poor DB performance.
 * When returning object (DTOs or entities) in read-only endpoints, it's better to use projection queries to avoid various Hibernate related issues,
   like N+1 select, or accidentally loading a bunch of related objects that are not actually needed in the result.
-* Enable Spring Boot Actuator for health checks, etc.
+* ✅ Enable Spring Boot Actuator for health checks, etc.
 * Add authentication and authorization (Spring Security)
 * Add metrics (Micrometer)
 * Add API for managing orgs, events, awards
