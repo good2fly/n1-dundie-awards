@@ -1,5 +1,6 @@
 package com.ninjaone.dundie_awards.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -18,6 +19,13 @@ public class ErrorHandlerAdvice {
     @ExceptionHandler({ IllegalArgumentException.class})
     public ResponseEntity<ErrorResponse> handleIllegalArgException(IllegalArgumentException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status)
+                .body(ErrorResponse.create(ex, status, ex.getMessage()));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(EntityNotFoundException ex) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
         return ResponseEntity.status(status)
                 .body(ErrorResponse.create(ex, status, ex.getMessage()));
     }

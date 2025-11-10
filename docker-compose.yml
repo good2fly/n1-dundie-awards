@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"  # AMQP port
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password
+
+#  app:
+#    image: dundie-awards:latest
+#    container_name: dundie-app
+#    depends_on:
+#      - postgres
+#      - redis
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dundie
+#      SPRING_DATASOURCE_USERNAME: dundie
+#      SPRING_DATASOURCE_PASSWORD: secret
+#      SPRING_REDIS_HOST: redis
+#      SPRING_REDIS_PORT: "6379"
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#    ports:
+#      - "3000:3000"
+#    restart: always
+#
+#  postgres:
+#    image: postgres:15-alpine
+#    container_name: dundie-postgres
+#    environment:
+#      POSTGRES_DB: dundie
+#      POSTGRES_USER: dundie
+#      POSTGRES_PASSWORD: secret
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -U dundie -d dundie"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#    volumes:
+#      - postgres-data:/var/lib/postgresql/data
+#    restart: always
+#volumes:
+#  postgres-data:

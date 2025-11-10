@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,9 +34,9 @@ public class EmployeeController {
     }
 
     // get all employees
-    @Transactional(readOnly = true)
     @GetMapping("/employees")
     public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
+        logger.info("getAllEmployees: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
         logger.debug("getAllEmployees: invoked");
         // TODO would be better to sort by last name (or something) to make response deterministic
         List<Employee> employees = employeeService.findAllEmployees();
@@ -44,18 +44,18 @@ public class EmployeeController {
     }
 
     // create employee rest api
-    @Transactional
     @PostMapping("/employees")
     public ResponseEntity<EmployeeDto> createEmployee(@RequestBody @Valid EmployeeRequest employee) {
+        logger.info("createEmployee: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
         logger.debug("createEmployee: invoked with request: {}", employee);
         Employee created = employeeService.create(employee);
         return ResponseEntity.ok(toDto(created));
     }
 
     // get employee by id rest api
-    @Transactional(readOnly = true)
     @GetMapping("/employees/{id}")
     public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable long id) {
+        logger.info("getEmployeeById: transactional? {}", TransactionSynchronizationManager.isActualTransactionActive());
         logger.debug("getEmployeeById: invoked with id: {}", id);
         Optional<Employee> optionalEmployee = employeeService.findById(id);
         return optionalEmployee.map(employee -> ResponseEntity.ok(toDto(employee)))
@@ -63,7 +63,6 @@ public class EmployeeController {
     }
 
     // update employee rest api
-    @Transactional
     @PutMapping("/employees/{id}")
     public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable long id, @RequestBody @Valid EmployeeRequest employeeDetails) {
         logger.debug("updateEmployee: invoked with id: {}, details: {}", id, employeeDetails);
@@ -73,7 +72,6 @@ public class EmployeeController {
     }
 
     // delete employee rest api
-    @Transactional
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable long id) {
         logger.debug("deleteEmployee: invoked with id: {}", id);

@@ -32,7 +32,7 @@ public class Employee {
     @Column(name = "dundie_awards")
     private int dundieAwards;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Organization organization;
 
     @CreatedDate

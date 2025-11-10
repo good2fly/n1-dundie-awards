@@ -1,6 +1,8 @@
 logging:
   level:
     org.springframework: INFO
+    org.hibernate: INFO
+    org.hibernate.stat: DEBUG
     com.ninjaone.dundie_awards: DEBUG
 
 springdoc:
@@ -10,26 +12,38 @@ server:
   port: 3000
 
 spring:
+  devtools:
+    restart:
+      enabled: true
   datasource:
     url: jdbc:h2:mem:mydb
     username: sa
     password: password
   jpa:
     show-sql: true
-  #  datasource:
+    properties:
+      hibernate:
+        generate_statistics: true
+#      javax:
+#        persistence:
+#          schema-generation:
+#            scripts:
+#              action: create
+#              create-target: create.sql
+#              create-source: metadata
 #    url: jdbc:postgresql://localhost:5432/postgres
 #    username: postgres
 #    password: postgres
-#  jpa:
-#    show-sql: true
-#    properties:
-#      ## Hibernate Properties
-#      # The SQL dialect makes Hibernate generate better SQL for the chosen database
-#      hibernate:
-#        dialect: org.hibernate.dialect.PostgreSQLDialect
-#    # Hibernate ddl auto (create, create-drop, validate, update)
-#    hibernate:
-#      ddl-auto: update
+  amqp:
+    rabbit:
+      listener:
+        simple:
+          default-requeue-rejected: false
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: password
   thymeleaf: # Thymeleaf
     cache: false
     mode: HTML
@@ -40,6 +54,8 @@ spring:
       static-locations: file:src/main/resources/static/
       cache:
         period: 0
+  main:
+    banner-mode: off
 
 management:
   endpoints:

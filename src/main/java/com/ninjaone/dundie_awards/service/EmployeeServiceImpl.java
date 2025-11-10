@@ -8,6 +8,7 @@ import com.ninjaone.dundie_awards.request.EmployeeRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final EmployeeRepository employeeRepository;
     private final OrganizationRepository organizationRepository;
 
@@ -24,16 +26,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         this.organizationRepository = organizationRepository;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Employee> findById(long id) {
         return employeeRepository.findById(id);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Employee> findAllEmployees() {
         return employeeRepository.findAll();
     }
 
+    @Transactional
     @Override
     public Employee create(EmployeeRequest employeeRequest) {
 
@@ -43,6 +48,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.save(employee);
     }
 
+    @Transactional
     @Override
     public Optional<Employee> update(long id, EmployeeRequest employeeRequest) {
         return employeeRepository.findById(id)
@@ -53,6 +59,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 });
     }
 
+    @Transactional
     @Override
     public boolean deleteById(long id) {
 
