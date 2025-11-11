@@ -1,9 +1,10 @@
 package com.ninjaone.dundie_awards.repository;
 
 import com.ninjaone.dundie_awards.model.DundieAwardEvent;
+import com.ninjaone.dundie_awards.model.DundieAwardRollbackEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DundieAwardEventRepository extends JpaRepository<DundieAwardEvent, Long> {
+public interface DundieAwardRollbackEventRepository extends JpaRepository<DundieAwardRollbackEvent, Long> {
 }

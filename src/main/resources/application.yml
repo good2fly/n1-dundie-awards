@@ -34,16 +34,15 @@ spring:
 #    url: jdbc:postgresql://localhost:5432/postgres
 #    username: postgres
 #    password: postgres
-  amqp:
-    rabbit:
-      listener:
-        simple:
-          default-requeue-rejected: false
   rabbitmq:
     host: localhost
     port: 5672
     username: admin
     password: password
+    listener:
+      simple:
+        # Instead of putting the message back onto the source queue after an error,
+        default-requeue-rejected: false
   thymeleaf: # Thymeleaf
     cache: false
     mode: HTML

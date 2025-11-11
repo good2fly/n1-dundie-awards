@@ -12,3 +12,4 @@ public record DundieAwardGranted(String idempotencyKey, long orgId, LocalDateTim
         this(UUID.randomUUID().toString(), orgId, occurredAt, Collections.unmodifiableSet(affectedEmpIds));
     }
 }
+

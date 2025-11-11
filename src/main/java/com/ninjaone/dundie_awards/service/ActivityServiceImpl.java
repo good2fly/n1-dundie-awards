@@ -31,11 +31,12 @@ public class ActivityServiceImpl implements ActivityService {
         logger.info("createActivityForAwardGranted: creating activity for award granted event: {}", event);
         DundieAwardEvent dundieAwardEvent = new DundieAwardEvent(event.idempotencyKey());
         dundieAwardEventRepository.save(dundieAwardEvent); // make sure we haven't handled this award grant yet
-        // TODO clean these idempotency records up after some configurable time
+        // TODO clean these idempotency records up after some configurable time. In a real system, it may be better to use Redis for this as it can expire them automatically.
 
         Activity activity = new Activity();
         activity.setEvent("Dundie Award was granted to " + event.affectedEmpIds().size() + " employees at organization ID=" + event.orgId());
         activity.setOccurredAt(event.occurredAt());
         activityRepository.save(activity);
     }
+
 }

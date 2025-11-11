@@ -88,7 +88,7 @@
 * ✅ Add audit fields (e.g. createdAt, createdBy, updatedAt, updatedBy) to the entities.
 * Add entity versioning (e.g. using `@Version`) to entities in order to support optimistic locking.
 * Add API versioning (Spring 7 supports this out of the box)
-* Add caching (e.g. Redis + Spring `@Cacheable`, etc. annotations)
+* Add caching (e.g. Redis)
 * Consider adding missing indexes on FK columns (e.g. `organization_id` in `employees`).
   These will be most likely needed for reverse joins (i.e. join organizations to employees) at some point and engineers probably won't remember doing them then,
   leading to very poor DB performance.
@@ -102,9 +102,17 @@
 * Separate Spring profiles/config for runtime, test, etc.
 * Organize by use cases rather than technical layers to make code easier to understand and change.
 * Add Docker Compose file to start up the whole stack for local testing, especially after switching to PostgreSQL and adding Redis
+* Add retry (e.g. using Spring )
 
-## Miscellaneous Notes
-### Docker
+## Running the App
+
+### Docker Compose
+* To start RabbitMQ, execute the following command before the application,  `docker compose up -d`
+* To stop RabbitMQ after done with the app, execute `docker compose down`
+
+TODO: Add Spring Boot Docker Compose support
+
+### Build/Run Docker Image
 
 * To build image using the Gradle plugin: `  ./gradlew bootBuildImage --imageName=dundie-awards:latest`
 * To run (same port): `docker run --rm -p 3000:3000 dundie-awards:latest`

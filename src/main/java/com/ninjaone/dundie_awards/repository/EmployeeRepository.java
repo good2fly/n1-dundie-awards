@@ -28,10 +28,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = false)
     @Query("""
         UPDATE Employee e
-        SET e.dundieAwards = e.dundieAwards + 1
+        SET e.dundieAwards = e.dundieAwards + :increment
         WHERE e.id in (:empIds)
     """)
-    int incrementAwardCount(@Param("empIds") Collection<Long> empIds);
+    int addToAwardCount(@Param("empIds") Collection<Long> empIds, @Param("increment") int increment);
 
     @Query("""
         SELECT e.id
@@ -39,10 +39,4 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
         WHERE e.organization.id = :organizationId
     """)
     Set<Long> findAllIdsByOrganizationId(@Param("organizationId") long organizationId);
-
-//    // We'll need this for the rollback
-//    @Modifying
-//    @Query("UPDATE Employee e SET e.dundieAwards = e.dundieAwards - 1 WHERE e.organization.id = :organizationId AND e.dundieAwards > 0")
-//    int decrementDundieAwardsByOrganization(@Param("organizationId") Long organizationId);
-
 }

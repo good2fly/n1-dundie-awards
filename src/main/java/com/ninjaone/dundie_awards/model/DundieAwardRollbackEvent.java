@@ -13,12 +13,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.Instant;
 
 /**
- * A record to keep track of award grant events, and ensure idempotency of grants.
+ * A record to keep track of award rollback events, and ensure idempotency of rollbacks.
  */
 @Entity
-@Table(name = "dundie_award_events")
+@Table(name = "dundie_award_rollback_events")
 @EntityListeners(AuditingEntityListener.class)
-public class DundieAwardEvent {
+public class DundieAwardRollbackEvent { // TODO could share a base class w/ DundieAwardEvent to avoid code duplication
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +39,10 @@ public class DundieAwardEvent {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    public DundieAwardEvent() {
+    public DundieAwardRollbackEvent() {
     }
 
-    public DundieAwardEvent(String idempotencyKey) {
+    public DundieAwardRollbackEvent(String idempotencyKey) {
         this.idempotencyKey = idempotencyKey;
     }
 
